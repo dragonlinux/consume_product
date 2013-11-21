@@ -1,0 +1,6 @@
+*.o
+# vim #
+*.swp
+*.vim
+*.viminfo
+*.out
