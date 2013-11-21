@@ -1,10 +1,3 @@
-#############################################################
-# friso chinese word segmentation makefile.		    #
-#		do not use it for commercial use.	    #
-# @author	chenxin 				    #
-# @email	chenxin619315@gmail.com   		    #
-#############################################################
-
 #complie
 CC = gcc
 #include directory
