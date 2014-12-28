@@ -67,19 +67,23 @@ extern void progress_show( progress_t *bar, float bit1, float bit2,float bit3,fl
 	fflush(stdout);
 	break;
     case PROGRESS_BGC_STYLE:
+    memset(bar->pro1, 0x00,bar->max);
+    memset(bar->pro2, 0x00,bar->max);
+    memset(bar->pro3, 0x00,bar->max);
+    memset(bar->pro4, 0x00,bar->max);
 	memset(bar->pro1, 32, val1);
 	memset(bar->pro2, 32, val2);
 	memset(bar->pro3, 32, val3);
 	memset(bar->pro4, 32, val4);
-	printf("\033[?25l\033[32m\033[1m%s\033[44m %d%% %s\033[?25h\033[0m\r\n/
-            \033[?25l\033[32m\033[1m%s\033[44m %d%% %s\033[?25h\033[0m\r\n/
-            \033[?25l\033[32m\033[1m%s\033[44m %d%% %s\033[?25h\033[0m\r\n/
-            \033[?25l\033[32m\033[1m%s\033[44m %d%% %s\033[?25h\033[0m\r", 
-		bar->title1, (int)(bar->offset * val1), bar->pro1,
-		bar->title2, (int)(bar->offset * val2), bar->pro2,
-		bar->title3, (int)(bar->offset * val3), bar->pro3,
-		bar->title4, (int)(bar->offset * val4), bar->pro4);
-	fflush(stdout);
+	printf(/*\033[K\033[1A*/"\033[K\033[1A\033[K\033[1A\033[K\033[1A\033[K\033[?25l\033[32m\033[1m%s\033[44m %d%% %s\033[?25h\033[0m\n\
+\033[?25l\033[32m\033[1m%s\033[43m %d%% %s\033[?25h\033[0m\n\
+\033[?25l\033[32m\033[1m%s\033[42m %d%% %s\033[?25h\033[0m\n\
+\033[?25l\033[32m\033[1m%s\033[41m %d%% %s\033[?25h\033[0m\r",
+//product number = %d\r", 
+    bar->title1, (int)(bar->offset * val1), bar->pro1,bar->title2, (int)(bar->offset * val2), bar->pro2,
+    bar->title3, (int)(bar->offset * val3), bar->pro3,
+    bar->title4, (int)(bar->offset * val4), bar->pro4);
+    fflush(stdout);
 	break;
     }
 }

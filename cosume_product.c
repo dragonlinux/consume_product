@@ -8,60 +8,108 @@
 
 #define TOTAL 5
 #define INIT 2
+#define SLEEP 50000
 
 sem_t *full,*empty,*muxtex,*number;
 
 int num = 0;
 int filedes[2];
 
+float bar_pro,bar_cos,bar_sub,bar_get;
+int fbar_pro[2],fbar_cos[2],fbar_sub[2],fbar_get[2];
 
-void process_bar(char * str)
+
+void process_bar()
 {
+    printf("\n\n");
     progress_t bar;
-    progress_init(&bar, str, 50, PROGRESS_BGC_STYLE);
-    int i;
-    for ( i = 0; i <= 50; i++ ) {
-	progress_show(&bar, i/50.0f);
-	usleep(60000);
+    progress_init(&bar,"product ","consume ","submit  ","get     ", 50, PROGRESS_BGC_STYLE);
+    while(1)
+    {
+        read(fbar_pro[0],&bar_pro,sizeof(bar_pro));
+        read(fbar_cos[0],&bar_cos,sizeof(bar_cos));
+        read(fbar_sub[0],&bar_sub,sizeof(bar_sub));
+        read(fbar_get[0],&bar_get,sizeof(bar_get));
+        progress_show(&bar, bar_pro,bar_cos,bar_sub,bar_get);
+        write(fbar_pro[1],&bar_pro,sizeof(bar_pro));
+        write(fbar_cos[1],&bar_cos,sizeof(bar_cos));
+        write(fbar_sub[1],&bar_sub,sizeof(bar_sub));
+        write(fbar_get[1],&bar_get,sizeof(bar_get));
+ 
+        usleep(SLEEP);
     }
-    printf("\n");
     progress_destroy(&bar);
 
 }
 
 void product()
 {
-    printf("Product ......\n"); 
-    process_bar("product");
+    int i=0;
+    for(;i<50;i++)
+    {
+        read(fbar_pro[0],&bar_pro,sizeof(bar_pro));
+        bar_pro = i/50.0f;
+        write(fbar_pro[1],&bar_pro,sizeof(bar_pro));
+        usleep(SLEEP*2);
+    }
+    read(fbar_pro[0],&bar_pro,sizeof(bar_pro));
+    bar_pro = 0;
+    write(fbar_pro[1],&bar_pro,sizeof(bar_pro));
+
 }
 void consume()
 {
-    printf("Consume .......\n"); 
-    process_bar("consume");
+    int i=0;
+    for(;i<50;i++)
+    {
+        read(fbar_cos[0],&bar_pro,sizeof(bar_pro));
+        bar_pro = i/50.0f;
+        write(fbar_cos[1],&bar_pro,sizeof(bar_pro));
+        usleep(SLEEP*5);
+    }
+        read(fbar_cos[0],&bar_pro,sizeof(bar_pro));
+        bar_pro = 0;
+        write(fbar_cos[1],&bar_pro,sizeof(bar_pro));
 }
 
 int SubmitPruductBuffer()
 {
+    int i=0;
     sem_wait(number);
     read(filedes[0],&num,sizeof(num));
     num++;
     write(filedes[1],&num,sizeof(num));
     sem_post(number);
-    printf("Submit ........\n");
-    process_bar("submit");
-    printf("Now the buffer has %d products\n",num);
+    for(;i<50;i++)
+    {
+        read(fbar_sub[0],&bar_pro,sizeof(bar_pro));
+        bar_pro = i/50.0f;
+        write(fbar_sub[1],&bar_pro,sizeof(bar_pro));
+        usleep(SLEEP*3);
+    }
+        read(fbar_sub[0],&bar_pro,sizeof(bar_pro));
+        bar_pro = 0;
+        write(fbar_sub[1],&bar_pro,sizeof(bar_pro));
     return num;
 }
 int GetProductBuffer()
 {
+    int i=0;
     sem_wait(number);
     read(filedes[0],&num,sizeof(num));
     num--;
     write(filedes[1],&num,sizeof(num));
     sem_post(number);
-    printf("Get .......\n");
-    process_bar("get");
-    printf("Now the buffer has %d products\n",num);
+    for(;i<50;i++)
+    {
+        read(fbar_get[0],&bar_pro,sizeof(bar_pro));
+        bar_pro = i/50.0f;
+        write(fbar_get[1],&bar_pro,sizeof(bar_pro));
+        usleep(SLEEP*3);
+    }
+        read(fbar_get[0],&bar_pro,sizeof(bar_pro));
+        bar_pro = 0;
+        write(fbar_get[1],&bar_pro,sizeof(bar_pro));
     return num;
 }
 
@@ -107,7 +155,7 @@ void killfun()
 int main(void)
 {
 
-    int p1;
+    int p1,p2;
     signal(SIGINT,killfun);
     full = sem_open("full",O_CREAT,S_IRWXU,0);
     empty = sem_open("empty",O_CREAT,S_IRWXU,5);
@@ -118,17 +166,36 @@ int main(void)
    // pthread_join(ptd2,NULL);
     number = sem_open("number",O_CREAT,S_IRWXU,1);
     pipe(filedes);
-
+    pipe(fbar_pro);
+    pipe(fbar_cos);
+    pipe(fbar_sub);
+    pipe(fbar_get);
+    bar_pro = 0;
+    bar_cos = 0;
+    bar_sub = 0;
+    bar_get = 0;
     while((p1=fork())==-1);
     if(p1!=0)
     {
-        write(filedes[1],&num,sizeof(num));
-        producer();
+        while((p2=fork())==-1);
+        if(p2!=0)
+        {
+            write(fbar_pro[1],&bar_pro,sizeof(bar_pro));
+            write(fbar_cos[1],&bar_cos,sizeof(bar_cos));
+            write(fbar_sub[1],&bar_sub,sizeof(bar_sub));
+            write(fbar_get[1],&bar_get,sizeof(bar_get));
+            write(filedes[1],&num,sizeof(num));
+            
+            producer();
+        }
+        else
+        {
+            process_bar();
+        }
     }
     else
     {
         consumer();
     }
-
     return 0;
 }
