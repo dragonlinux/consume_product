@@ -11,20 +11,26 @@
 
 typedef struct {
     char chr;		/*tip char*/
-    char *title;	/*tip string*/
+    char *title1;	/*tip string*/
+    char *title2;	/*tip string*/
+    char *title3;	/*tip string*/
+    char *title4;	/*tip string*/
     int style;		/*progress style*/
     int max;		/*maximum value*/
     float offset;
-    char *pro;
+    char *pro1;
+    char *pro2;
+    char *pro3;
+    char *pro4;
 } progress_t;
 
 #define PROGRESS_NUM_STYLE 0
 #define PROGRESS_CHR_STYLE 1
 #define PROGRESS_BGC_STYLE 2
 
-extern void progress_init(progress_t *, char *, int, int);
+extern void progress_init(progress_t *, char *,char *,char *,char *, int, int);
 
-extern void progress_show(progress_t *, float);
+extern void progress_show(progress_t *, float, float, float, float);
 
 extern void progress_destroy(progress_t *);
 

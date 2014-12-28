@@ -16,7 +16,7 @@ int main(int argc, char *argv[] )
     int i;
     for ( i = 0; i <= 50; i++ ) {
 	progress_show(&bar, i/50.0f);
-	sleep(1);
+	usleep(100000);
     }
     printf("\n+-Done\n");
 

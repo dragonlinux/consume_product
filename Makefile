@@ -8,7 +8,7 @@ CFLAGS = -g -Wall
 FFLAGS = -O2 -Wall -fPIC
 
 all: ltpro.c ltpro.h tst-pro.c
-	$(CC) $(CFLAGS) ltpro.c tst-pro.c
+	$(CC) $(CFLAGS) ltpro.c cosume_product.c
 
 #clean all the object files.
 .PHONY: clean
