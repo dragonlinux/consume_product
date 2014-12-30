@@ -8,7 +8,7 @@
 
 #define TOTAL 5
 #define INIT 2
-#define SLEEP 50000
+#define SLEEP 5000
 
 sem_t *full,*empty,*muxtex,*number;
 
@@ -21,16 +21,25 @@ int fbar_pro[2],fbar_cos[2],fbar_sub[2],fbar_get[2];
 
 void process_bar()
 {
+    char * title[4] = {"product ","consume ","submit  ","get     "};
+    float data[4];
     printf("\n\n");
     progress_t bar;
-    progress_init(&bar,"product ","consume ","submit  ","get     ", 50, PROGRESS_BGC_STYLE);
+
+    progress_init(&bar,4,title, 50, PROGRESS_BGC_STYLE);
     while(1)
     {
         read(fbar_pro[0],&bar_pro,sizeof(bar_pro));
         read(fbar_cos[0],&bar_cos,sizeof(bar_cos));
         read(fbar_sub[0],&bar_sub,sizeof(bar_sub));
         read(fbar_get[0],&bar_get,sizeof(bar_get));
-        progress_show(&bar, bar_pro,bar_cos,bar_sub,bar_get);
+        read(filedes[0],&num,sizeof(num));
+        data[0] = bar_pro;
+        data[1] = bar_cos;
+        data[2] = bar_sub;
+        data[3] = bar_get;
+        progress_show(&bar, data,num);
+        write(filedes[1],&num,sizeof(num));
         write(fbar_pro[1],&bar_pro,sizeof(bar_pro));
         write(fbar_cos[1],&bar_cos,sizeof(bar_cos));
         write(fbar_sub[1],&bar_sub,sizeof(bar_sub));
@@ -50,7 +59,7 @@ void product()
         read(fbar_pro[0],&bar_pro,sizeof(bar_pro));
         bar_pro = i/50.0f;
         write(fbar_pro[1],&bar_pro,sizeof(bar_pro));
-        usleep(SLEEP*2);
+        usleep(SLEEP*4);
     }
     read(fbar_pro[0],&bar_pro,sizeof(bar_pro));
     bar_pro = 0;
@@ -65,7 +74,7 @@ void consume()
         read(fbar_cos[0],&bar_pro,sizeof(bar_pro));
         bar_pro = i/50.0f;
         write(fbar_cos[1],&bar_pro,sizeof(bar_pro));
-        usleep(SLEEP*5);
+        usleep(SLEEP*8);
     }
         read(fbar_cos[0],&bar_pro,sizeof(bar_pro));
         bar_pro = 0;
@@ -75,21 +84,22 @@ void consume()
 int SubmitPruductBuffer()
 {
     int i=0;
-    sem_wait(number);
-    read(filedes[0],&num,sizeof(num));
-    num++;
-    write(filedes[1],&num,sizeof(num));
-    sem_post(number);
+    
     for(;i<50;i++)
     {
         read(fbar_sub[0],&bar_pro,sizeof(bar_pro));
         bar_pro = i/50.0f;
         write(fbar_sub[1],&bar_pro,sizeof(bar_pro));
-        usleep(SLEEP*3);
+        usleep(SLEEP*2);
     }
         read(fbar_sub[0],&bar_pro,sizeof(bar_pro));
         bar_pro = 0;
         write(fbar_sub[1],&bar_pro,sizeof(bar_pro));
+        sem_wait(number);
+    read(filedes[0],&num,sizeof(num));
+    num++;
+    write(filedes[1],&num,sizeof(num));
+    sem_post(number);
     return num;
 }
 int GetProductBuffer()
@@ -105,7 +115,7 @@ int GetProductBuffer()
         read(fbar_get[0],&bar_pro,sizeof(bar_pro));
         bar_pro = i/50.0f;
         write(fbar_get[1],&bar_pro,sizeof(bar_pro));
-        usleep(SLEEP*3);
+        usleep(SLEEP*2);
     }
         read(fbar_get[0],&bar_pro,sizeof(bar_pro));
         bar_pro = 0;
