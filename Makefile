@@ -7,7 +7,7 @@ CFLAGS = -g -Wall
 #complile flags for products
 FFLAGS = -O2 -Wall -fPIC
 
-all: ltpro.c ltpro.h tst-pro.c
+all: ltpro.c ltpro.h 
 	$(CC) $(CFLAGS) ltpro.c cosume_product.c -o pv
 
 #clean all the object files.

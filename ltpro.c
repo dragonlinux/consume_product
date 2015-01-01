@@ -31,6 +31,7 @@ extern void progress_show( progress_t *bar,float *bit, int product)
     int number = bar->number;
     int *val = (int *)malloc(sizeof(int)*number);
     int i;
+    int color = 0;
     for(i = 0;i < number;i++)
     {
         val[i] = (int)(bit[i] * bar->max);
@@ -45,8 +46,9 @@ extern void progress_show( progress_t *bar,float *bit, int product)
     }
     for(i=0;i<number;i++)
     {
-        printf("\033[?25l\033[32m\033[1m%s\033[43m %d%% %s\033[?25h\033[0m\n",
-    bar->title[i], (int)(bar->offset * val[i]), bar->pro[i]);
+        color = i%5+1;
+        printf("\033[?25l\033[32m\033[1m%s\033[4%dm %d%% %s\033[?25h\033[0m\n",
+                bar->title[i],color, (int)(bar->offset * val[i]), bar->pro[i]);
     }
     printf("product number = %d\r",product);
     fflush(stdout);

@@ -1,14 +1,14 @@
-Linux终端进度条封装.
+#生产者--消费者问题
+-------
+##解决方法
+由于缓冲区是临界资源，所以要使用同步机制进行处理。此处采用了pv信号灯的方法。
 
-效果:
+##设置生产者消费者个数
+根据`consume_product.c`文件中定义的宏`COMSUME`,`PRODUCT`，调控生产者和消费者的个数。
 
-(1). PROGRESS_NUM_STYLE效果:
-<img src="http://static.oschina.net/uploads/space/2013/1121/171700_r74u_853816.jpg"/> <br />
+##运行速度
+`consume_product.c`中定义的宏`SLEEP`控制运行速度
 
-(2). PROGRESS_CHR_STYLE效果:
-<img src="http://static.oschina.net/uploads/space/2013/1121/171725_58sR_853816.jpg"/> <br />
-
-(3). PROGRESS_BGC_STYLE效果:
-<img src="http://static.oschina.net/uploads/space/2013/1121/171746_nnei_853816.jpg"/> <br />
-
-使用博客: http://my.oschina.net/jcseg/blog/178047
+##展示
+此处专门开辟了一个进程来做进度的展示。如图所示
+![show](./Screen Shot 2015-01-01 at 3.25.00 PM.png)
